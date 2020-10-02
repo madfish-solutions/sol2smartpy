@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Solidity to SmartPY transpiler</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.25.0/slimselect.min.css" rel="stylesheet"></link>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-168630183-1"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+
+      gtag('config', 'UA-168630183-1');
+    </script>
+
+  </head>
+  <body>
+    <div class="nav">
+      <div style='display:flex; align-items: center; flex: 1;'>
+
+        <div class="logo">Sol2Smartpy</div>
+        <select id="single" style='display: none'>
+        </select>
+        <div class="example_selector">
+          <span id="load_msg">
+            Need some time to load. Loading...
+          </span>
+        </div>
+      </div>
+      <span>
+        <a style="background: transparent;" href="https://github.com/madfish-solutions/sol2smartpy" target="_blanc"><img alt="GitHub stars" src="https://img.shields.io/github/stars/madfish-solutions/sol2smartpy?label=Github%20Stars&logo=github&style=for-the-badge"></a>
+      </span>
+    </div>
+    <div class="code">
+      <div class="code-wrapper">
+        <div class="code-tabs">
+          <div class="code-tab active" style="border-left: 0;">
+            Solidity
+          </div>
+        </div>
+        <div class="code-inner" id="solidity_container"></div>
+      </div>
+      <div class="code-wrapper">
+        <div class="code-tabs" id="outputs">
+          <div class="code-tab active" id="smartpy">
+            Smartpy
+          </div>
+          <!-- <div class="code-tab" id="output">
+            Output 2
+          </div> -->
+          <div class="code-tab" id="default_state">
+            Default state
+          </div>
+          
+          <div class="code-tab" id="logs">
+            Errors
+          </div>
+        </div>
+        <div
+          style="border-left: 1px solid black"
+          class="code-inner"
+          id="smartpy_container"
+        ></div>
+      </div>
+      <!-- <pre id="ligo_dst"></pre> -->
+      <!-- </div> -->
+      <!-- <div class="minibutton" id="compile_btn">Compiling...</div> -->
+    </div>
+    <footer>
+      <div class='social-icons'>
+        <a href='https://medium.com/madfish-solutions' target="_blanc">
+          <svg fill='#fff' width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm0 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm-2.426 14.741h-3.574v-.202l1.261-1.529c.134-.139.195-.335.162-.526v-5.304c.015-.147-.041-.293-.151-.392l-1.121-1.35v-.201h3.479l2.689 5.897 2.364-5.897h3.317v.201l-.958.919c-.083.063-.124.166-.106.269v6.748c-.018.103.023.206.106.269l.936.919v.201h-4.706v-.201l.969-.941c.095-.095.095-.123.095-.269v-5.455l-2.695 6.844h-.364l-3.137-6.844v4.587c-.026.193.038.387.174.526l1.26 1.529v.202z"/></svg>
+        </a>
+        <a href='https://twitter.com/madfishofficial' target="_blanc">
+          <svg xmlns="http://www.w3.org/2000/svg" fill='#fff' width="24" height="24" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm6.5 8.778c-.441.196-.916.328-1.414.388.509-.305.898-.787 1.083-1.362-.476.282-1.003.487-1.564.597-.448-.479-1.089-.778-1.796-.778-1.59 0-2.758 1.483-2.399 3.023-2.045-.103-3.86-1.083-5.074-2.572-.645 1.106-.334 2.554.762 3.287-.403-.013-.782-.124-1.114-.308-.027 1.14.791 2.207 1.975 2.445-.346.094-.726.116-1.112.042.313.978 1.224 1.689 2.3 1.709-1.037.812-2.34 1.175-3.647 1.021 1.09.699 2.383 1.106 3.773 1.106 4.572 0 7.154-3.861 6.998-7.324.482-.346.899-.78 1.229-1.274z"/></svg>
+        </a>
+        <a href='https://www.facebook.com/madfishofficial/' target="_blanc">
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" fill='#fff' height="24" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm-2 10h-2v2h2v6h3v-6h1.82l.18-2h-2v-.833c0-.478.096-.667.558-.667h1.442v-2.5h-2.404c-1.798 0-2.596.792-2.596 2.308v1.692z"/></svg>
+        </a>
+        <a href="https://github.com/madfish-solutions" target="_blank" >
+          <svg fill='#fff' xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2c5.514 0 10 4.486 10 10s-4.486 10-10 10-10-4.486-10-10 4.486-10 10-10zm0-2c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm0 6c-3.313 0-6 2.686-6 6 0 2.651 1.719 4.9 4.104 5.693.3.056.396-.13.396-.289v-1.117c-1.669.363-2.017-.707-2.017-.707-.272-.693-.666-.878-.666-.878-.544-.373.041-.365.041-.365.603.042.92.619.92.619.535.917 1.403.652 1.746.499.054-.388.209-.652.381-.802-1.333-.152-2.733-.667-2.733-2.965 0-.655.234-1.19.618-1.61-.062-.153-.268-.764.058-1.59 0 0 .504-.161 1.65.615.479-.133.992-.199 1.502-.202.51.002 1.023.069 1.503.202 1.146-.776 1.648-.615 1.648-.615.327.826.121 1.437.06 1.588.385.42.617.955.617 1.61 0 2.305-1.404 2.812-2.74 2.96.216.186.412.551.412 1.111v1.646c0 .16.096.347.4.288 2.383-.793 4.1-3.041 4.1-5.691 0-3.314-2.687-6-6-6z"/></svg>
+        </a>
+      </div>
+      <span class='madfish'>
+        <span style="color: #fff">Made with ❤️ by&nbsp;</span>
+        <a href='https://madfish.solutions' target="_blanc" style='text-decoration: underline; color: inherit'>Madfish.Solutions</a>
+      </span>
+    
+    </footer> 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/slim-select/1.25.0/slimselect.min.js"></script>
+
+    <script>
+      window._solc = {}
+      window._require_hash = {};
+      window.require_register = function(file) {
+        var orig_file = file;
+        var ret = {}
+        while(reg_ret = /\/(.*)/.exec(file)) {
+          file = reg_ret[1];
+          if (window._require_hash['./'+file]) {
+            console.error("re-register", './'+file, "orig_file", orig_file);
+            continue;
+          }
+          window._require_hash['./'+file] = ret;
+        }
+        return ret;
+      }
+      window.require = function(file) {
+        file = file.replace(/^(\.\.\/)+/, './');
+        if (!window._require_hash[file]) {
+          throw new Error(`can't require ${file}`)
+        }
+        return window._require_hash[file];
+      }
+    </script>
+    <script src="web/solc/soljson-v0.4.26+commit.4563c3fc.js"></script>
+    <script src="web/solc/soljson-v0.5.11+commit.c082d0b4.js"></script>
+    <script src="web/solc/sol_wrapper.js"></script>
+    <script src="web/common/fy.js"></script>
+    <script src="web/common/codegen.js"></script>
+    <script src="web/lib/config.js"></script>
+    <script src="web/common/type.js"></script>
+    <script src="web/lib/type_safe.js"></script>
+    <script src="web/common/ast4gen.js"></script>
+    <script src="web/lib/ast.js"></script>
+    <script src="web/lib/type_generalize.js"></script>
+    <script src="web/lib/solidity_to_ast4gen.js"></script>
+    <script src="web/lib/translate_var_name_smartpy.js"></script>
+    
+    <script src="web/lib/type_inference/common.js"></script>
+    <script src="web/lib/type_inference/stage1.js"></script>
+    <script src="web/lib/type_inference/stage2.js"></script>
+    <script src="web/lib/type_inference.js"></script>
+    
+    <script src="web/lib/translate_smartpy.js"></script>
+    <script src="web/lib/translate_smartpy_default_state.js"></script>
+    
+    <script src="web/lib/ast_builder.js"></script>
+    <script src="web/lib/transforms/default_walk.js"></script>
+    <script src="web/lib/transforms/collect_fn_call.js"></script>
+    <script src="web/lib/transforms/placeholder_replace.js"></script>
+    
+    <!-- <script src="web/lib/transforms/var_translate.js"></script>                      -->
+    <!-- <script src="web/lib/transforms/require_distinguish.js"></script>                -->
+    <!-- <script src="web/lib/transforms/fix_missing_emit.js"></script>                   -->
+    <script src="web/lib/transforms/fix_modifier_order.js"></script>
+    <!-- <script src="web/lib/transforms/for3_unpack.js"></script>                        -->
+    <script src="web/lib/transforms/math_funcs_convert.js"></script>
+    <script src="web/lib/transforms/ass_op_unpack.js"></script>
+    <script src="web/lib/transforms/modifier_unpack.js"></script>
+    <!-- <script src="web/lib/transforms/inheritance_unpack.js"></script>                 -->
+    <!-- <script src="web/lib/transforms/deep_check_storage_and_oplist_use.js"></script>  -->
+    <!-- <script src="web/lib/transforms/decl_storage_and_oplist_inject.js"></script>     -->
+    <script src="web/lib/transforms/mark_last.js"></script>
+    <!-- <script src="web/lib/transforms/router_collector.js"></script>                   -->
+    <!-- <script src="web/lib/transforms/add_router.js"></script>                         -->
+    <!-- <script src="web/lib/transforms/collect_fn_decl.js"></script>                    -->
+    <!-- <script src="web/lib/transforms/call_storage_and_oplist_inject.js"></script>     -->
+    <!-- <script src="web/lib/transforms/replace_enums_by_nat.js"></script>               -->
+    <!-- <script src="web/lib/transforms/intrinsics_converter.js"></script>               -->
+    <!-- <script src="web/lib/transforms/erc20_converter.js"></script>                    -->
+    <!-- <script src="web/lib/transforms/erc721_converter.js"></script>                   -->
+    <!-- <script src="web/lib/transforms/return_op_list_count.js"></script>               -->
+    <!-- <script src="web/lib/transforms/address_calls_converter.js"></script>            -->
+    <!-- <script src="web/lib/transforms/split_nested_index_access.js"></script>          -->
+    <!-- <script src="web/lib/transforms/erc_detector.js"></script>                       -->
+                                                                                          -->
+    <script src="web/lib/ast_transform_smartpy.js"></script>
+    <script src="web/example_list.js"></script>
+    <script>
+      // NOTE MONACO EDITOR will replace require
+      var solidity_to_ast4gen = require("./solidity_to_ast4gen");
+      var ast_transform = require("./ast_transform_smartpy");
+      var type_inference = require("./type_inference");
+      var translate_smartpy = require("./translate_smartpy");
+      var translate_smartpy_default_state = require("./translate_smartpy_default_state");
+    </script>
+    <!-- MONACO EDITOR -->
+    <script
+      type="text/javascript"
+      src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min/vs/loader.min.js"
+    ></script>
+    <script>
+      document.querySelector("#load_msg").innerText =
+        "Very experimental. Use it at your own RISK.";
+      var warning_list;
+      var argv = {
+        router : true,
+        contract : "",
+        disable_enums_to_nat : false
+      }
+      function compile(code) {
+        argv.router = window.router.checked
+        argv.disable_enums_to_nat = window.disable_enums_to_nat.checked
+        argv.contract = window.contract.value
+
+        return new Promise((res, rej) => {
+          var perr_old = window.perr;
+          var puts_old = window.puts;
+          warning_list = [];
+          window.perr = function() {
+            var arg_list = Array.prototype.slice.call(arguments);
+            var str_list = arg_list.map((t)=>{
+              if (t.formattedMessage) { // solc errors
+                return t.formattedMessage;
+              } else {
+                return ''+t;
+              }
+            });
+            warning_list.push(str_list.join(" "));
+          }
+          window.puts = function() {
+            warning_list.push(Array.prototype.join.call(arguments, " "));
+          }
+          try {
+            opt = {
+              router  : argv.router,
+              contract : argv.contract,
+              replace_enums_by_nats: !argv.disable_enums_to_nat
+            }
+            const solidity_ast = ast_gen(code);
+            let ast = solidity_to_ast4gen.gen(solidity_ast);
+            ast = ast_transform.pre_ti(ast, opt);
+            ast = type_inference.gen(ast, opt);
+            ast = ast_transform.post_ti(ast, opt);
+            const result = translate_smartpy.gen(ast, opt);
+            const result_default_state = translate_smartpy_default_state.gen(ast, opt);
+            res({result, result_default_state});
+          } catch (err) {
+            warning_list.push(err.stack)
+            rej(err);
+          }
+          window.perr = perr_old;
+          window.puts = puts_old;
+        });
+      }
+
+      window.compile = compile;
+    </script>
+
+    <script>
+      const monacoCdnMin =
+        "https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.20.0/min";
+
+      require.config({
+        paths: { vs: `${monacoCdnMin}/vs` }
+      });
+
+      // Before loading vs/editor/editor.main, define a global MonacoEnvironment that overwrites
+      // the default worker url location (used when creating WebWorkers). The problem here is that
+      // HTML5 does not allow cross-domain web workers, so we need to proxy the instantiation of
+      // a web worker through a same-domain script
+      window.MonacoEnvironment = {
+        getWorkerUrl: function(workerId, label) {
+          return `data:text/javascript;charset=utf-8,${encodeURIComponent(`
+        self.MonacoEnvironment = {
+          baseUrl: '${monacoCdnMin}'
+        };
+        importScripts('${monacoCdnMin}/vs/base/worker/workerMain.js');`)}`;
+        }
+      };
+
+      require(["vs/editor/editor.main"], () => {
+        const settingsOverlayWidget = {
+          height: 120, // in px
+          domNode: null,
+          getId: function() {
+            return "settings.overlay.widget";
+          },
+          getDomNode: function() {
+            if (!this.domNode) {
+              this.domNode = document.createElement("div");
+              this.domNode.innerHTML = `
+                <div class="panel-row">
+                  <h4 style="margin: 0;">Compilation Options</h4>
+                </div>
+                <div class="panel-row">
+                  <div class="contract-name-input">
+                    <label>Contract name:</label>
+                    <input type=text id="contract" value="" placeholder="Counter" onblur="onPanelChange()"/>
+                  </div>
+                </div>
+                <div class="panel-row">
+                  <div class="panel-checkbox">
+                    <input type=checkbox id="router" name="router" checked onchange="onPanelChange()"/>
+                    <label for="router">Add router</label>
+                  </div>
+                  <div class="panel-checkbox">
+                    <input type=checkbox id="disable_enums_to_nat" name="disable_enums_to_nat" onchange="onPanelChange()"/>
+                    <label for="disable_enums_to_nat">Disable enums to nat conversion</label>
+                  </div>
+                </div>
+              `;
+              this.domNode.classList.add('panel');
+              this.domNode.style.position = "absolute";
+              this.domNode.style.width = "calc(100% - 14px)"; // take scrollbars into account
+              this.domNode.style.height = this.height + "px";
+              this.domNode.style.zIndex = "20";
+              this.domNode.style.left = "0";
+              this.domNode.style.top = (solidityEditor.getContentHeight() - this.height) + 'px';
+            }
+            return this.domNode;
+          },
+          getPosition: function() {
+            return null;
+          },
+        };
+        const overlayWidget = {
+          domNode: null,
+          getId: function() {
+            return "my.overlay.widget";
+          },
+          getDomNode: function() {
+            if (!this.domNode) {
+              this.domNode = document.createElement("div");
+              this.domNode.classList.add("minibutton");
+              this.domNode.innerHTML = "Compiling...";
+              this.domNode.style.position = "absolute";
+              this.domNode.style.right = "20px";
+              this.domNode.style.top = "10px";
+              this.domNode.style.zIndex = "20";
+            }
+            return this.domNode;
+          },
+          getPosition: function() {
+            return null;
+          },
+          loading() {
+            if (!this.domNode) return;
+            this.domNode.innerHTML = "Compiling...";
+            this.domNode.style.display = "block";
+            this.domNode.style.background = "#fff";
+            this.domNode.style.color = "black";
+          },
+          success() {
+            if (!this.domNode) return;
+            this.domNode.style.display = "none";
+          },
+          error() {
+            if (!this.domNode) return;
+            this.domNode.innerHTML = "ERROR!!!";
+            this.domNode.style.color = "white";
+            this.domNode.style.background = "#faa";
+          }
+        };
+
+        const data = {
+          sol: { model: null, state: null },
+          smartpy: { model: null, state: null },
+          output: { model: null, state: null },
+          default_state: { model: null, state: null },
+          logs: { model: null, state: null }
+        };
+
+        data.sol.model = monaco.editor.createModel(example_list[0].code, "sol");
+        data.smartpy.model = monaco.editor.createModel("", "smartpy");
+        data.output.model = monaco.editor.createModel("OUTPUTS", "text");
+        data.default_state.model = monaco.editor.createModel("", "text");
+        data.logs.model = monaco.editor.createModel("LOGS", "text");
+
+        const opts = {
+          tabSize: "2",
+          automaticLayout: true,
+          theme: "vs-dark",
+          wordWrap: "on",
+          minimap: {
+            enabled: false
+          }
+        };
+
+        const solidityEditor = monaco.editor.create(
+          document.getElementById("solidity_container"),
+          {
+            model: data.sol.model,
+            ...opts
+          }
+        );
+
+        const outputEditor = monaco.editor.create(
+          document.getElementById("smartpy_container"),
+          {
+            model: data.smartpy.model,
+            ...opts,
+            readOnly: true
+          }
+        );
+
+        solidityEditor.addOverlayWidget(overlayWidget);
+        solidityEditor.addOverlayWidget(settingsOverlayWidget);
+
+        const slimData = example_list.reduce((acc, example) => {
+          const {title, code} = example;
+          if(code) {
+            acc.currentObject.options.push(({text: title}))
+            return acc
+          } else {
+            const newObj = { label: title, options: [] }
+            acc.currentObject = newObj;
+            acc.data.push(newObj)
+            return acc
+          }
+
+        }, {currentObject: null, data: []})
+
+        const initSelect = () => {
+          const onChange = val => {
+
+            const example = example_list.find(ex => ex.title === val);
+            data.sol.model.setValue(example.code);
+          }
+
+
+          onChange(slimData.data[0].options[0].text)
+
+
+          const selectNode = document.querySelector('#single');
+          selectNode.style.display = 'block';
+
+          new SlimSelect({
+            select: '#single',
+            showSearch: false,
+            data: slimData.data,
+            onChange: data => onChange(data.value)
+          })
+        }
+
+        initSelect()
+
+        let timeout = null;
+        function onChange(code) {
+          if (timeout) clearTimeout(timeout);
+          overlayWidget.loading();
+          timeout = setTimeout(() => {
+            timeout = null;
+
+            compile(code)
+              .then(({result, result_default_state}) => {
+                data.smartpy.model.setValue(result);
+                data.default_state.model.setValue(result_default_state);
+                if (data.logs.model) data.logs.model.setValue(warning_list.join("\n"));
+                overlayWidget.success();
+              })
+              .catch(err => {
+                console.dir(err);
+                if (data.logs.model) data.logs.model.setValue(warning_list.join("\n"));
+                overlayWidget.error();
+              });
+          }, 100);
+        }
+
+        onChange(solidityEditor.getValue());
+
+        window.onPanelChange = ()=> {
+          const code = solidityEditor.getValue();
+          onChange(code);
+        }
+        solidityEditor.onDidChangeModelContent(onPanelChange);
+
+        function onChangeTab(fromId, toId) {
+          console.log(event);
+        }
+
+        const outputsNode = document.getElementById("outputs");
+        Array.from(outputsNode.children).forEach(node => {
+          node.onclick = () => {
+            outputsNode.querySelector(".active").classList.remove("active");
+            node.classList.add("active");
+
+            const currentState = outputEditor.saveViewState();
+            const currentModel = outputEditor.getModel();
+
+            if (currentModel === data.smartpy.model) {
+              data.smartpy.state = currentState;
+            } else if (currentModel === data.output.state) {
+              data.output.state = currentState;
+            } else if (currentModel === data.logs.state) {
+              data.logs.state = currentState;
+            }
+
+            outputEditor.setModel(data[node.id].model);
+            outputEditor.restoreViewState(data[node.id].state);
+          };
+        });
+      });
+    </script>
+  </body>
+</html>

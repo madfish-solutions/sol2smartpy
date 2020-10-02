@@ -1,0 +1,20 @@
+node_modules
+coverage
+lib
+solc-bin
+test.sol
+test.ligo
+test.pp.ligo
+test.py
+*.log
+report.sh
+.vscode
+
+# ganache
+db
+build
+
+# temp
+contracts/Test*.sol
+migrations/*Test*.js
+tmp/
